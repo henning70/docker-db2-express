@@ -12,9 +12,9 @@ if [ $# -lt 8 ]
 then
 	echo -e \
 	"usage: $0 [-d database_name] [-p port] [-s pagesize] [-l license_file]\n\n" \
-	"- pagesize is one of: 4K, 8K, 16K or 32K\n" \
+	"- pagesize is one of: 4096, 8192, 16384 or 32768\n" \
 	"- license_file must be specified without .lic\n\n" \
-	"example: $0 -d sample -p 50000 -s 8K -l db2expc_uw\n"
+	"example: $0 -d sample -p 50000 -s 8192 -l db2expc_uw\n"
 	exit 1
 fi
 
@@ -28,15 +28,14 @@ do
 		-l) license="$2"; shift;;
 		-?) echo -e \
 				"usage: $0 [-d database_name] [-p port] [-s pagesize] [-l license_file]\n\n" \
-				"- pagesize is one of: 4K, 8K, 16K or 32K\n" \
-				"- license_file must be specified without .lic\n\n \"
-				"example: $0 -d sample -p 50000 -s 8K -l db2expc_uw\n"
+				"- pagesize is one of: 4096, 8192, 16384 or 32768\n" \
+				"- license_file must be specified without .lic\n\n" \
+				"example: $0 -d sample -p 50000 -s 8192 -l db2expc_uw\n"
 				exit 1;;
 		*) break;;
 	esac
 	shift
 done
-exit 0
 
 # display the given arguments
 echo -e "* The following will be used to generate the Dockerfile for docker build"

@@ -1,0 +1,146 @@
+Sending build context to Docker daemon 17.41 kB
+Step 1 : FROM henning70/db2-express-base
+ ---> 3ed71fed1ba9
+Step 2 : MAINTAINER Henning van Wyk <henning@hjitconsulting.com>
+ ---> Running in d16e8b1cd588
+ ---> 073de5a88335
+Removing intermediate container d16e8b1cd588
+Step 3 : RUN groupadd db2iadm1
+ ---> Running in 8b22ffa7f705
+ ---> bfc3804c4ed9
+Removing intermediate container 8b22ffa7f705
+Step 4 : RUN groupadd db2fadm1
+ ---> Running in df85b4e9d936
+ ---> 5e0bd275a5dd
+Removing intermediate container df85b4e9d936
+Step 5 : RUN groupadd dasadm1
+ ---> Running in eae958c2b060
+ ---> d70bbedbb0ee
+Removing intermediate container eae958c2b060
+Step 6 : RUN useradd -g db2iadm1 -m -d /home/db2inst1 db2inst1
+ ---> Running in fc17cabd52a0
+ ---> 06e1ffce161b
+Removing intermediate container fc17cabd52a0
+Step 7 : RUN useradd -g db2fadm1 -m -d /home/db2fenc1 db2fenc1
+ ---> Running in c4ff094f9bef
+ ---> 03bb059d7f79
+Removing intermediate container c4ff094f9bef
+Step 8 : RUN useradd -g dasadm1 -m -d /home/dasusr1 dasusr1
+ ---> Running in f6633cee270c
+ ---> 0d2ae11f15ed
+Removing intermediate container f6633cee270c
+Step 9 : RUN echo "db2inst1:DB2inst1" | chpasswd
+ ---> Running in 6244fbb3e834
+ ---> 9eac69a673e8
+Removing intermediate container 6244fbb3e834
+Step 10 : RUN echo "db2fenc1:DB2fenc1" | chpasswd
+ ---> Running in 410174e2d364
+ ---> f8c925e5d160
+Removing intermediate container 410174e2d364
+Step 11 : RUN echo "dasusr1:DASusr1_" | chpasswd
+ ---> Running in 717d0f99513e
+ ---> 655e76b1e2a5
+Removing intermediate container 717d0f99513e
+Step 12 : RUN /opt/ibm/db2/V10.5/instance/db2icrt -a SERVER -p 50000 -u db2fenc1 db2inst1
+ ---> Running in 95720171d137
+DB2 installation is being initialized.
+
+ Total number of tasks to be performed: 4 
+Total estimated time for all tasks to be performed: 309 second(s) 
+
+Task #1 start
+Description: Setting default global profile registry variables 
+Estimated time 1 second(s) 
+Task #1 end 
+
+Task #2 start
+Description: Initializing instance list 
+Estimated time 5 second(s) 
+Task #2 end 
+
+Task #3 start
+Description: Configuring DB2 instances 
+Estimated time 300 second(s) 
+Task #3 end 
+
+Task #4 start
+Description: Updating global profile registry 
+Estimated time 3 second(s) 
+Task #4 end 
+
+The execution completed successfully.
+
+For more information see the DB2 installation log at "/tmp/db2icrt.log.1".
+DBI1446I  The db2icrt command is running.
+
+
+DBI1070I  Program db2icrt completed successfully.
+
+
+ ---> acef81fc8684
+Removing intermediate container 95720171d137
+Step 13 : ADD db2expc_uw.lic /home/db2inst1
+ ---> 022505884a14
+Removing intermediate container b6b97c608923
+Step 14 : RUN /opt/ibm/db2/V10.5/adm/db2licm -a /home/db2inst1/db2expc_uw.lic
+ ---> Running in dce035897974
+
+LIC1402I  License added successfully.
+
+
+LIC1426I  This product is now licensed for use as outlined in your License Agreement.  USE OF THE PRODUCT CONSTITUTES ACCEPTANCE OF THE TERMS OF THE IBM LICENSE AGREEMENT, LOCATED IN THE FOLLOWING DIRECTORY: "/opt/ibm/db2/V10.5/license/en_US.iso88591"
+ ---> 693c0941a957
+Removing intermediate container dce035897974
+Step 15 : RUN mkdir -p /data/db2/MYDB/DATA
+ ---> Running in 94913aef733d
+ ---> 127d9de4a231
+Removing intermediate container 94913aef733d
+Step 16 : RUN mkdir -p /data/db2/MYDB/LOG
+ ---> Running in 59ab20138203
+ ---> 2b87f217ee12
+Removing intermediate container 59ab20138203
+Step 17 : RUN chown -R db2inst1:db2iadm1 /data/db2
+ ---> Running in 7cd106cd8203
+ ---> 9ac9a2920ef9
+Removing intermediate container 7cd106cd8203
+Step 18 : RUN chmod -R 750 /data/db2
+ ---> Running in 4f31e1d72c3a
+ ---> 9dc3d1a7bdbc
+Removing intermediate container 4f31e1d72c3a
+Step 19 : RUN echo "#!/bin/bash" > /home/db2inst1/create_db.sh
+ ---> Running in 8502920d09c1
+ ---> 33448d7e05a8
+Removing intermediate container 8502920d09c1
+Step 20 : RUN echo 'su - db2inst1 -c "db2 update dbm cfg using SVCENAME 50000"' >> /home/db2inst1/create_db.sh
+ ---> Running in 32f418f9f1b4
+ ---> f24adcd97848
+Removing intermediate container 32f418f9f1b4
+Step 21 : RUN echo 'su - db2inst1 -c "db2 update dbm cfg using DFTDBPATH /data/db2"' >> /home/db2inst1/create_db.sh
+ ---> Running in 7b311ae44fd1
+ ---> 00c123d623c4
+Removing intermediate container 7b311ae44fd1
+Step 22 : RUN echo 'su - db2inst1 -c "db2set DB2COMM=TCPIP"' >> /home/db2inst1/create_db.sh
+ ---> Running in 5f7498093e24
+ ---> 3548963d4b25
+Removing intermediate container 5f7498093e24
+Step 23 : RUN echo 'su - db2inst1 -c "db2start"' >> /home/db2inst1/create_db.sh
+ ---> Running in 49b1bd3860e5
+ ---> db62385d71ae
+Removing intermediate container 49b1bd3860e5
+Step 24 : RUN echo 'su - db2inst1 -c "db2 create db MYDB on /data/db2/MYDB/DATA using codeset utf-8 territory us pagesize 8K"' >> /home/db2inst1/create_db.sh
+ ---> Running in b9fac19b97cf
+ ---> 537c2d874ca6
+Removing intermediate container b9fac19b97cf
+Step 25 : RUN echo 'su - db2inst1 -c "db2 update db cfg for MYDB using NEWLOGPATH /data/db2/MYDB/LOG"' >> /home/db2inst1/create_db.sh
+ ---> Running in 939d7d3c267d
+ ---> 4c2f0512e27e
+Removing intermediate container 939d7d3c267d
+Step 26 : RUN chmod 750 /home/db2inst1/create_db.sh
+ ---> Running in c678355202c5
+ ---> ae804f1b6b6c
+Removing intermediate container c678355202c5
+Step 27 : EXPOSE 50000
+ ---> Running in c428d445a099
+ ---> eab65833d26f
+Removing intermediate container c428d445a099
+Successfully built eab65833d26f
