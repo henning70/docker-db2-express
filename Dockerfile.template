@@ -1,0 +1,62 @@
+FROM db2-express-base
+MAINTAINER Henning van Wyk <henning@hjitconsulting.com>
+
+# create the db2 groups
+RUN groupadd db2iadm1
+RUN groupadd db2fadm1
+RUN groupadd dasadm1
+
+# create the db2 users
+RUN useradd -g db2iadm1 -m -d /home/db2inst1 db2inst1
+RUN useradd -g db2fadm1 -m -d /home/db2fenc1 db2fenc1
+RUN useradd -g dasadm1 -m -d /home/dasusr1 dasusr1
+
+# set the passwords of the db2 users
+RUN echo "db2inst1:DB2inst1" | chpasswd
+RUN echo "db2fenc1:DB2fenc1" | chpasswd
+RUN echo "dasusr1:DASusr1_" | chpasswd
+
+# create the db2 instance
+RUN /opt/ibm/db2/V10.5/instance/db2icrt -a SERVER -p CONTAINER_PORT -u db2fenc1 db2inst1
+
+# load the db2 license
+ADD CONTAINER_LIC.lic /home/db2inst1
+RUN /opt/ibm/db2/V10.5/adm/db2licm -a /home/db2inst1/CONTAINER_LIC.lic
+
+# create the data path for db2 database
+RUN mkdir -p /data/db2/CONTAINER_DB/DATA
+
+# create the log path for db2 database
+RUN mkdir -p /data/db2/CONTAINER_DB/LOG
+
+# change ownership to the default db2 database path
+RUN chown -R db2inst1:db2iadm1 /data/db2
+
+# change permissions to the default db2 database path
+RUN chmod -R 750 /data/db2
+
+# create a script to execute during initial run of this container
+# 1. set the shell for the script
+RUN echo "#!/bin/bash" > /home/db2inst1/create_db.sh
+
+# 2. update some database manager parameters
+RUN echo 'su - db2inst1 -c "db2 update dbm cfg using SVCENAME CONTAINER_PORT"' >> /home/db2inst1/create_db.sh
+RUN echo 'su - db2inst1 -c "db2 update dbm cfg using DFTDBPATH /data/db2"' >> /home/db2inst1/create_db.sh
+
+# 3. set db2 communication protocol
+RUN echo 'su - db2inst1 -c "db2set DB2COMM=TCPIP"' >> /home/db2inst1/create_db.sh
+
+# 4. start db2
+RUN echo 'su - db2inst1 -c "db2start"' >> /home/db2inst1/create_db.sh
+
+# 5. create the db2 database
+RUN echo 'su - db2inst1 -c "db2 create db CONTAINER_DB on /data/db2/CONTAINER_DB/DATA using codeset utf-8 territory us pagesize CONTAINER_PS"' >> /home/db2inst1/create_db.sh
+
+# 6. update the log path of the newly created database
+RUN echo 'su - db2inst1 -c "db2 update db cfg for CONTAINER_DB using NEWLOGPATH /data/db2/CONTAINER_DB/LOG"' >> /home/db2inst1/create_db.sh
+
+# change permissions on the script
+RUN chmod 750 /home/db2inst1/create_db.sh
+
+# expose the port of the db2 instance
+EXPOSE CONTAINER_PORT
