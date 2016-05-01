@@ -1,4 +1,4 @@
-FROM db2-express-base
+FROM henning70/db2-express-base
 MAINTAINER Henning van Wyk <henning@hjitconsulting.com>
 
 # create the db2 groups
