@@ -8,7 +8,6 @@ The sample can be used as is to create a sample container without having to modi
 
 ### Dockerfile.template
 The template contains a number of tags that has to be replaced before you can run docker build. I provided a script to assist with this. The tags that need to be replaced are:
-* CONTAINER_LIC   - DB2 license file
 * CONTAINER_DB    - DB2 database name for the container
 * CONTAINER_PORT  - DB2 instance port for the container
 * CONTAINER_PS    - DB2 database pagesize *(4096, 8192, 16384 or 32768)*
