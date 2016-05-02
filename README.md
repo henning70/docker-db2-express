@@ -17,12 +17,11 @@ The template contains a number of tags that has to be replaced before you can ru
 This script will build a *Dockerfile* from *Dockerfile.template* based on the arguments you provide to the script. If no arguments are passed to the script, it will print a usage statement with an example.
 ```
 $ ./build_dockerfile.sh 
-usage: ./build_dockerfile.sh [-d database_name] [-p port] [-s pagesize] [-l license_file]
+usage: ./build_dockerfile.sh [-d database_name] [-p port] [-s pagesize]
 
  - pagesize is one of: 4096, 8192, 16384 or 32768
- - license_file must be specified without .lic
 
- example: ./build_dockerfile.sh -d sample -p 50000 -s 8192 -l db2expc_uw
+ example: ./build_dockerfile.sh -d sample -p 50000 -s 8192
 ```
 Ensure you made the script executable before running it.
 ```
@@ -32,16 +31,12 @@ $ chmod 755 build_dockerfile.sh
 ## Instructions
 - Get your hands on *Dockerfile.template*, *Dockerfile.sample (optional)* and *build_dockerfile.sh*
 - Place these files in a docker build location of your choice
-- You will need to get the license file for DB2 Express-C (use the link below)
- * https://www.ibm.com/developerworks/downloads/im/db2express/
-- Extract the download and copy the *.lic* file from <download_location>/db2/license to your docker build location
 - Your docker location should now consist of the following files:
  * build_dockerfile.sh
  * Dockerfile.template
  * Dockerfile.sample *(optional)*
- * db2expc_uw.lic
 - Run *build_dockerfile.sh* to generate the Dockerfile to use for docker build
- * ```$ ./build_dockerfile.sh -d mydb -p 50000 -s 8192 -l db2expc_uw ```
+ * ```$ ./build_dockerfile.sh -d mydb -p 50000 -s 8192```
 - You should now have a Dockerfile to use for docker build
 - Run docker build *(-t, the tag for the container can be anything you want it to be)*
  * ```$ docker build -t db2-express-demo .```

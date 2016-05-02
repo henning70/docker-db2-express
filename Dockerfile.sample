@@ -19,10 +19,6 @@ RUN echo "dasusr1:DASusr1_" | chpasswd
 # create the db2 instance
 RUN /opt/ibm/db2/V10.5/instance/db2icrt -a SERVER -p 50000 -u db2fenc1 db2inst1
 
-# load the db2 license
-ADD db2expc_uw.lic /home/db2inst1
-RUN /opt/ibm/db2/V10.5/adm/db2licm -a /home/db2inst1/db2expc_uw.lic
-
 # create the data path for db2 database
 RUN mkdir -p /data/db2/DOCKER/DATA
 
